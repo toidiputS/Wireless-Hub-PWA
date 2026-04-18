@@ -1,0 +1,15 @@
+{
+  "name": "phone-keyboard",
+  "version": "1.0.0",
+  "description": "Use your phone as a wireless keyboard for your PC — with swipe typing support",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.0",
+    "localtunnel": "^1.8.3",
+    "qrcode-terminal": "^0.12.0",
+    "ws": "^8.18.0"
+  }
+}

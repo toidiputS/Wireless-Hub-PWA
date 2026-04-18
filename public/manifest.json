@@ -1,0 +1,18 @@
+{
+  "name": "Wireless Hub",
+  "short_name": "Hub",
+  "description": "PC Remote Control Hub",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#ff007a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192 512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
