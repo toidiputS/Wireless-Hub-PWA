@@ -10,49 +10,71 @@ const statusBox = document.getElementById('status-box');
 const trialBtn = document.getElementById('start-trial-btn');
 const buyBtn = document.getElementById('buy-now-btn');
 
+let trialInterval;
+
 function initHub() {
   const isPaid = localStorage.getItem('hub-paid') === 'true';
   const trialStart = localStorage.getItem('hub-trial-start');
   const now = Date.now();
 
   if (isPaid) {
-    launchApp();
+    statusBox.innerHTML = `<h2>LIFETIME ACCESS</h2><div class="time">PRO UNLOCKED</div>`;
+    trialBtn.innerText = "LAUNCH HUB";
+    trialBtn.onclick = () => launchApp();
+    buyBtn.style.display = 'none';
   } else if (trialStart) {
-    const elapsed = now - parseInt(trialStart);
-    if (elapsed < TRIAL_DURATION) {
-      const remaining = TRIAL_DURATION - elapsed;
-      const hours = Math.floor(remaining / (3600 * 1000));
-      statusBox.innerHTML = `<h2>TRIAL ACTIVE</h2><div class="time">${hours}h REMAINING</div>`;
-      trialBtn.innerText = "CONTINUE TO HUB";
-      trialBtn.onclick = () => launchApp();
-    } else {
-      statusBox.innerHTML = `<h2>TRIAL EXPIRED</h2><div class="time">LIFETIME ACCESS REQUIRED</div>`;
-      trialBtn.style.display = 'none';
-    }
+    updateTrialStatus();
+    trialInterval = setInterval(updateTrialStatus, 1000);
   } else {
     statusBox.innerHTML = `<h2>WELCOME</h2><div class="time">24-HOUR FREE TRIAL</div>`;
     trialBtn.onclick = () => {
       localStorage.setItem('hub-trial-start', Date.now());
       launchApp();
+      initHub(); // Restart logic to show timer
     };
+  }
+}
+
+function updateTrialStatus() {
+  const trialStart = parseInt(localStorage.getItem('hub-trial-start'));
+  const now = Date.now();
+  const elapsed = now - trialStart;
+
+  if (elapsed < TRIAL_DURATION) {
+    const remaining = TRIAL_DURATION - elapsed;
+    const hrs = Math.floor(remaining / (3600 * 1000));
+    const mins = Math.floor((remaining % (3600 * 1000)) / (60 * 1000));
+    const secs = Math.floor((remaining % (60 * 1000)) / 1000);
+    
+    statusBox.innerHTML = `<h2>TRIAL ACTIVE</h2><div class="time">${hrs}h ${mins}m ${secs}s</div>`;
+    trialBtn.innerText = "CONTINUE TO HUB";
+    trialBtn.onclick = () => launchApp();
+  } else {
+    clearInterval(trialInterval);
+    statusBox.innerHTML = `<h2>TRIAL EXPIRED</h2><div class="time" style="color:var(--accent)">PRO REQUIRED</div>`;
+    trialBtn.style.display = 'none';
+    landing.classList.add('active'); // Force landing if expired
+    appContainer.style.display = 'none';
   }
 }
 
 function launchApp() {
   landing.classList.remove('active');
   appContainer.style.display = 'flex';
-  connect();
+  if (!socket) connect();
 }
 
 buyBtn.onclick = () => {
+  vibrate();
+  // Live Stripe Link for Wireless Hub Lifetime Access
   window.location.href = "https://buy.stripe.com/dRm00lfnn2nR77ZbhC1VK0f";
 };
 
-// Mock payment verification (for testing/demo)
-// In production, your webhook would update your server/db
-if (window.location.search.includes('session=success')) {
+// Payment Success Verification
+if (window.location.search.includes('session=success') || window.location.search.includes('success=true')) {
   localStorage.setItem('hub-paid', 'true');
-  window.location.href = window.location.origin; // Clear URL
+  window.history.replaceState({}, document.title, window.location.pathname); // Clean URL
+  initHub();
 }
 
 // ── SOCKET & CORE ───────────────────────────────────────────
