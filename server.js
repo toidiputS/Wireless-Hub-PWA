@@ -11,7 +11,7 @@ const { spawn } = require('child_process');
 const os       = require('os');
 const path     = require('path');
 
-// ── Helpers ──────────────────────────────────────────────────
+// –– Helpers ────────────────────────────────────────────────
 function getLocalIPs() {
   const results = [];
   const interfaces = os.networkInterfaces();
@@ -25,11 +25,11 @@ function getLocalIPs() {
   return results;
 }
 
-// ── Configuration ────────────────────────────────────────────
-const PORT = parseInt(process.env.PORT || '3333', 10);
+// –– Configuration ────────────────────────────────────────────
+const PORT = parseInt(process.env.PORT || '3000', 10); // Changed from 3333 to 3000
 const HOST = '0.0.0.0';
 
-// ── Express ──────────────────────────────────────────────────
+// –– Express ────────────────────────────────────────────────
 const app    = express();
 // Disable caching so phone always gets latest CSS/JS
 app.use((req, res, next) => {
@@ -41,10 +41,10 @@ app.use((req, res, next) => {
 app.use(express.static(path.join(__dirname, 'public')));
 const server = http.createServer(app);
 
-// ── WebSocket ────────────────────────────────────────────────
+// –– WebSocket ────────────────────────────────────────────────
 const wss = new WebSocketServer({ server });
 
-// ── PowerShell SendInput Helper ──────────────────────────────
+// –– PowerShell SendInput Helper ────────────────────────────
 let psReady = false;
 const psHelper = spawn('powershell.exe', [
   '-NoProfile',
@@ -81,13 +81,13 @@ function sendToPS(cmd) {
   }
 }
 
-// ── WebSocket Connection Handler ─────────────────────────────
+// –– WebSocket Connection Handler ────────────────────────────
 let clientCount = 0;
 
 wss.on('connection', (ws, req) => {
   const clientIP = req.socket.remoteAddress?.replace('::ffff:', '') || 'unknown';
   clientCount++;
-  console.log(`  📱 Connected: ${clientIP}  (${clientCount} client${clientCount > 1 ? 's' : ''})`);
+  console.log(`  💕 Connected: ${clientIP}  (${clientCount} client${clientCount > 1 ? 's' : ''})`);
 
   ws.send(JSON.stringify({ type: 'connected', psReady }));
 
@@ -110,11 +110,11 @@ wss.on('connection', (ws, req) => {
 
   ws.on('close', () => {
     clientCount--;
-    console.log(`  📱 Disconnected: ${clientIP}  (${clientCount} client${clientCount > 1 ? 's' : ''})`);
+    console.log(`  💕 Disconnected: ${clientIP}  (${clientCount} client${clientCount > 1 ? 's' : ''})`);
   });
 });
 
-// ── Message Router ───────────────────────────────────────────
+// –– Message Router ────────────────────────────────────────
 function handleMessage(msg) {
   switch (msg.type) {
     case 'text':
@@ -160,16 +160,16 @@ function handleMessage(msg) {
   }
 }
 
-// ── Start Server ─────────────────────────────────────────────
+// –– Start Server ────────────────────────────────────────
 server.listen(PORT, HOST, () => {
   const ips = getLocalIPs();
   const primaryIP = ips.length > 0 ? ips[0].address : '127.0.0.1';
   const url = `http://${primaryIP}:${PORT}`;
 
   console.log('');
-  console.log('  ╔═══════════════════════════════════════════╗');
-  console.log('  ║        📱  Phone Keyboard Server          ║');
-  console.log('  ╚═══════════════════════════════════════════╝');
+  console.log('  Phone Keyboard Server');
+  console.log('  Express + WebSocket server that bridges the phone UI');
+  console.log('  to the Windows SendInput helper (PowerShell child process).');
   console.log('');
   console.log(`  Open on your phone:  ${url}`);
   if (ips.length > 1) {
@@ -201,16 +201,16 @@ server.listen(PORT, HOST, () => {
   console.log('  Waiting for phone to connect …');
   console.log('');
 
-  // ── Auto-tunnel (best-effort, never crashes the server) ─────
+  // –– Auto-tunnel (best-effort, never crashes the server) ─────
   // The localtunnel package has known compatibility issues with
   // newer Node versions.  We skip it entirely to keep the server
   // stable.  Use the local Wi-Fi URL or scan the QR code above.
-  console.log('  💡 Tip: Both devices must be on the same Wi-Fi.');
+  console.log('  ἱc Tip: Both devices must be on the same Wi-Fi.');
   console.log('      Use the local URL / QR code above on your phone.');
   console.log('');
 });
 
-// ── Graceful Shutdown ────────────────────────────────────────
+// –– Graceful Shutdown ────────────────────────────────────
 function shutdown() {
   console.log('\n  Shutting down …');
   try { psHelper.kill(); } catch {}

@@ -6,6 +6,16 @@
   <title>Wireless Hub</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <script>
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js').then(() => {
+        console.log('Service worker registered successfully');
+      }).catch(err => {
+        console.error('Service worker registration failed:', err);
+      });
+    }
+  </script>
 </head>
 <body>
   <!-- LANDING / PAYWALL LAYER -->
@@ -19,12 +29,11 @@
       <p class="tagline">Your PC. In your pocket.</p>
       
       <div id="status-box">
-        <!-- Will show trial time or purchase options -->
+        <!-- Status indicator (no trial/purchase info) -->
       </div>
-
+      
       <div class="landing-actions">
-        <button id="start-trial-btn" class="main-btn trial">START 24HR TRIAL</button>
-        <button id="buy-now-btn" class="main-btn buy">LIFETIME ACCESS - $9.00</button>
+        <!-- Trial and purchase buttons removed -->
       </div>
       
       <div class="features-list">
@@ -32,7 +41,7 @@
         <span><i class="fas fa-keyboard"></i> Full Keyboard</span>
         <span><i class="fas fa-mouse"></i> Multi-Touch Pad</span>
       </div>
-
+      
       <div class="landing-footer">
         <a href="https://github.com/toidiputS/Wireless-Hub-PWA" target="_blank">
           <i class="fab fa-github"></i> hub-v1.0.0
@@ -40,9 +49,9 @@
       </div>
     </div>
   </div>
-
-  <!-- MAIN APP CONTAINER (Hidden until trial/paid) -->
-  <main id="app-container" style="display: none;">
+  
+  <!-- MAIN APP CONTAINER -->
+  <main id="app-container">
     <!-- TRACKPAD -->
     <section id="trackpad">
       <div class="grid-bg"></div>
@@ -51,21 +60,21 @@
         <p>TAP = CLICK • 2-FINGER = SCROLL</p>
       </div>
     </section>
-
+    
     <!-- INPUT BAR -->
     <div class="type-container">
       <button id="clear-btn">CLEAR</button>
       <textarea id="type-input" placeholder="Type paragraph..." rows="1" inputmode="text" spellcheck="false"></textarea>
       <button id="enter-btn">ENTER</button>
     </div>
-
+    
     <!-- MOUSE BUTTONS -->
     <div class="mouse-row">
       <button class="mouse-btn left-btn" id="mouse-left">LEFT</button>
       <button class="mouse-btn mid-btn" id="mouse-middle">•</button>
       <button class="mouse-btn right-btn" id="mouse-right">RIGHT</button>
     </div>
-
+    
     <!-- ARROW ROW -->
     <div class="arrow-row">
       <button class="arrow-btn" data-key="left">←</button>
@@ -73,7 +82,7 @@
       <button class="arrow-btn" data-key="down">↓</button>
       <button class="arrow-btn" data-key="right">→</button>
     </div>
-
+    
     <!-- SPECIALTY GRID -->
     <div class="specialty-grid">
       <button class="spec-btn mod" data-key="ctrl">CTRL</button>
@@ -97,7 +106,7 @@
       <button class="spec-btn mod" data-key="win"><i class="fab fa-windows"></i></button>
     </div>
   </main>
-
+  
   <!-- Settings -->
   <div id="settings-modal" class="modal">
     <div class="modal-box">
@@ -109,11 +118,11 @@
       <div class="modal-footer">
         <a href="https://github.com/toidiputS/Wireless-Hub-PWA" target="_blank"><i class="fab fa-github"></i> VIEW ON GITHUB</a>
       </div>
-
+      
       <button id="close-settings" class="close-btn">SAVE & CLOSE</button>
     </div>
   </div>
-
+  
   <script src="app.js"></script>
 </body>
 </html>
